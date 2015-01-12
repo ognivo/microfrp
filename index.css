@@ -1,0 +1,25 @@
+body {
+    width: 200px;
+    margin: 0 auto;
+    white-space: pre;
+    font-size: 12px;
+    font-family: Arial;
+}
+.cell {
+    height: 100px;
+    width: 100%;
+    border: none;
+    padding: .5em;
+    box-sizing: border-box;
+    font-size: 12px;
+    word-break: break-word;
+}
+.cell--a {
+    background: #0fa;
+}
+.cell--b {
+    background: #aaf;
+}
+.cell--c {
+    background: #faa;
+}
