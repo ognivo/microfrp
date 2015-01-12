@@ -16,10 +16,13 @@ class Cell
     @val      = val
 
 
-  cell: (o) ->
+  cell: ({deps, map}) ->
+    if map
+      @map = map
+    #
     self = this
     val  = @val
-    for key, cell of o
+    for key, cell of deps
       do (key, cell) ->
         cell.depend (cell_val) ->
           val[key] = cell_val
@@ -35,11 +38,11 @@ class Cell
     setTimeout ->
       (dep_fn self.val)
 
-  function: (val) ->
+  map: (val) ->
     val
 
   set: (val) ->
-    val_transformed = @function(val)
+    val_transformed = @map(val)
     #
     if @set_raw
       @set_raw( val_transformed )
@@ -81,16 +84,11 @@ class UserInputSource extends ElementCell
     self.element.addEventListener 'input', ->
       self.set( self.io.read( self.element ) )
 
-  function: (val) ->
+  map: (val) ->
     '' == val && '0' || val
 
   set_raw: (val) ->
     @io.write( @element, val )
-
-
-class TextCell extends ElementCell
-  function: ({cella, cellb}) ->
-    parseInt(cella) + parseInt(cellb)
 
 
 class ImgCell extends ElementCell
@@ -102,15 +100,21 @@ class ImgCell extends ElementCell
 ca = document.querySelector('.cell--a')
 cb = document.querySelector('.cell--b')
 cc = document.querySelector('.cell--c')
+cx = document.querySelector('.cell--x')
 ci = document.querySelector('.cell--img')
 #
 input1    = new UserInputSource(ca)
 input2    = new UserInputSource(cb)
+input3    = new UserInputSource(cc)
 #
-text_cell = new TextCell(cc, {val: {cella: 0, cellb: 0}})
+text_cell = new ElementCell(cx, {val: {cella: 0, cellb: 0}})
 text_cell.cell(
-  { cella: input1
-  , cellb: input2 }
+  map: ({cella, cellb, cellc}) ->
+    parseInt(cellc) * (parseInt(cella) + parseInt(cellb))
+  deps:
+    { cella: input1
+    , cellb: input2
+    , cellc: input3 }
 )
 #
 #img_cell  = new ImgCell(ci, {val: {}})
